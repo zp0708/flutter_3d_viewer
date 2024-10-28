@@ -1,7 +1,7 @@
 name: flutter_3d_viewer
 description: "A new Flutter plugin project."
 version: 0.0.1
-homepage:
+homepage: https://github.com/zp0708/flutter_3d_viewer
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
