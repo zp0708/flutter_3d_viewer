@@ -1,0 +1,122 @@
+import Flutter
+import UIKit
+import SceneKit
+import GLTFSceneKit
+
+class GLBView: NSObject, FlutterPlatformView, UIGestureRecognizerDelegate {
+    var sceneView = SCNView()
+    var modelScene: SCNScene?
+
+    init(
+        frame: CGRect,
+        viewIdentifier viewId: Int64,
+        arguments args: Any?,
+        binaryMessenger messenger: FlutterBinaryMessenger
+    ) {
+        self.sceneView = SCNView(frame: frame)
+        super.init()
+        self.sceneView.backgroundColor = .clear
+        self.sceneView.allowsCameraControl = true
+        self.sceneView.showsStatistics = false
+        self.sceneView.autoenablesDefaultLighting = true
+        let params = args as? Dictionary<String, Any>
+        if let url = params?["url"] as? String {
+            downloadGLBForURL(url: url)
+        } else {
+            print("url is null")
+        }
+    }
+
+    func view() -> UIView {
+        return self.sceneView
+    }
+
+    func onDispose(_ result:FlutterResult) {
+//        sceneView.pause(<#Any?#>)
+        result(nil)
+    }
+    
+    private func downloadGLBForURL(url: String) {
+        print(url)
+//        let url = "https://pb-wolf-temp.materia-app.xyz/api/files/6u8j3gk3siljtfg/0k4s5dlb7kofxwa/67185b7ddf063629934daa4cc284688ec3bfbc8494_3_d_avatar_b4umycgCap.glb?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3OTI1NTEyODAsImlkIjoiYTQ1b3Qwbm5xNnV0eDd0IiwidHlwZSI6ImFkbWluIn0.KAyHwgq-Bzj2i5rnYo-ucuEaW5Jxpz2Wa2PJWtCULNg";
+        self.downloadFile(urlString: url) { url in
+            guard let modelFilePath = url else {
+                print("Model file path is nil")
+                return
+            }
+            
+            DispatchQueue.global().async {
+                do {
+                    let sceneSource = GLTFSceneSource(url: modelFilePath)
+                    let scene = try sceneSource.scene()
+                    DispatchQueue.main.async {
+                        self.sceneView.scene = scene
+                    }
+                } catch {
+                    print(error)
+                }
+            }
+        }
+    }
+    
+    // Creates a node form a given glb model path
+    func downloadFile(urlString: String, completion: @escaping (URL?) -> Void) {
+        
+        let downloadURL = URL(string: urlString)!
+        let fileManager = FileManager.default;
+        let paths = fileManager.urls(for: .libraryDirectory, in: .userDomainMask)
+        let cacheDirectory = paths[0].appendingPathComponent("Caches/3d_files/")
+        if !directoryIsExists(at: cacheDirectory.path) {
+            do {
+                try fileManager.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
+            } catch {
+                print(error)
+                completion(nil)
+                return
+            }
+        }
+        
+        let targetURL = cacheDirectory.appendingPathComponent(downloadURL.lastPathComponent)
+        
+        let path = targetURL.path
+        let exsit = FileManager.default.fileExists(atPath: path)
+        if exsit {
+            completion(targetURL)
+            return
+        }
+        
+        let configuration = URLSessionConfiguration.default
+        let session = URLSession(configuration: configuration)
+        
+        let task = session.downloadTask(with: downloadURL) { url, response, error in
+            // 检查是否有错误发生
+            guard error == nil else {
+                completion(nil)
+                return
+            }
+            
+            // 检查返回的数据是否有效
+            guard let response = response as? HTTPURLResponse, (200...299).contains(response.statusCode) else {
+                completion(nil)
+                return
+            }
+            
+            guard let fileURL = url else { return }
+            
+            do {
+                try? FileManager.default.removeItem(at: targetURL)
+                try FileManager.default.copyItem(at: fileURL, to: targetURL)
+                completion(targetURL)
+            } catch {
+                completion(nil)
+            }
+        }
+        task.resume()
+    }
+    
+    func directoryIsExists(at path: String) -> Bool {
+        var directoryExists = ObjCBool.init(false)
+        let fileExists = FileManager.default.fileExists(atPath: path, isDirectory: &directoryExists)
+        return fileExists && directoryExists.boolValue
+    }
+}
