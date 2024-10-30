@@ -1,6 +1,7 @@
 package com.example.flutter_3d_viewer
 
 import androidx.annotation.NonNull
+import io.carius.lars.ar_flutter_plugin.Flutter3dViewFactory
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
@@ -19,6 +20,8 @@ class Flutter3dViewerPlugin: FlutterPlugin, MethodCallHandler {
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_3d_viewer")
     channel.setMethodCallHandler(this)
+    flutterPluginBinding.platformViewRegistry.registerViewFactory(
+      "flutter_3d_viewer", Flutter3dViewFactory(flutterPluginBinding.binaryMessenger))
   }
 
   override fun onMethodCall(call: MethodCall, result: Result) {
