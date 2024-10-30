@@ -61,12 +61,14 @@ class _MyAppState extends State<MyApp> {
               Flutter3DViewWrap(
                 height: 300,
                 width: 300,
+                indicatorColor: Colors.red,
                 url:
                     'https://pb-wolf-temp.materia-app.xyz/api/files/6u8j3gk3siljtfg/txm2o5eh8ygku97/6717a913507f09d109095045769a795894bc02d554_3_d_avatar_tuThDMZ460.glb?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3OTI1NTEyODAsImlkIjoiYTQ1b3Qwbm5xNnV0eDd0IiwidHlwZSI6ImFkbWluIn0.KAyHwgq-Bzj2i5rnYo-ucuEaW5Jxpz2Wa2PJWtCULNg',
               ),
               Flutter3DViewWrap(
                 width: 300,
                 height: 300,
+                indicatorColor: Colors.black,
                 url:
                     'https://pb-wolf-temp.materia-app.xyz/api/files/6u8j3gk3siljtfg/0k4s5dlb7kofxwa/67185b7ddf063629934daa4cc284688ec3bfbc8494_3_d_avatar_b4umycgCap.glb?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3OTI1NTEyODAsImlkIjoiYTQ1b3Qwbm5xNnV0eDd0IiwidHlwZSI6ImFkbWluIn0.KAyHwgq-Bzj2i5rnYo-ucuEaW5Jxpz2Wa2PJWtCULNg',
               ),

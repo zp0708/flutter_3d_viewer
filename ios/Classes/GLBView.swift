@@ -6,6 +6,7 @@ import GLTFSceneKit
 class GLBView: NSObject, FlutterPlatformView, UIGestureRecognizerDelegate {
     var sceneView = SCNView()
     var modelScene: SCNScene?
+    let flutterChannel: FlutterMethodChannel
 
     init(
         frame: CGRect,
@@ -14,16 +15,28 @@ class GLBView: NSObject, FlutterPlatformView, UIGestureRecognizerDelegate {
         binaryMessenger messenger: FlutterBinaryMessenger
     ) {
         self.sceneView = SCNView(frame: frame)
+        self.flutterChannel = FlutterMethodChannel(name: "flutter_3d_viewer_channel_\(viewId)", binaryMessenger: messenger)
         super.init()
         self.sceneView.backgroundColor = .clear
         self.sceneView.allowsCameraControl = true
         self.sceneView.showsStatistics = false
         self.sceneView.autoenablesDefaultLighting = true
-        let params = args as? Dictionary<String, Any>
-        if let url = params?["url"] as? String {
-            downloadGLBForURL(url: url)
-        } else {
-            print("url is null")
+        self.flutterChannel.setMethodCallHandler(self.onAnchorMethodCalled)
+    }
+    
+    func onAnchorMethodCalled(_ call :FlutterMethodCall, _ result: @escaping FlutterResult) {
+        let arguments = call.arguments as? Dictionary<String, Any>
+        
+        switch call.method {
+        case "showGLBFromURL":
+            if let url = arguments!["url"] as? String {
+                downloadGLBForURL(url: url)
+            }
+            result(true)
+            break
+        default:
+            result(FlutterMethodNotImplemented)
+            break
         }
     }
 
@@ -32,7 +45,7 @@ class GLBView: NSObject, FlutterPlatformView, UIGestureRecognizerDelegate {
     }
 
     func onDispose(_ result:FlutterResult) {
-//        sceneView.pause(<#Any?#>)
+        self.flutterChannel.setMethodCallHandler(nil)
         result(nil)
     }
     
@@ -44,12 +57,13 @@ class GLBView: NSObject, FlutterPlatformView, UIGestureRecognizerDelegate {
                 print("Model file path is nil")
                 return
             }
-            
+            self.flutterChannel.invokeMethod("onStartLoading", arguments: nil)
             DispatchQueue.global().async {
                 do {
                     let sceneSource = GLTFSceneSource(url: modelFilePath)
                     let scene = try sceneSource.scene()
                     DispatchQueue.main.async {
+                        self.flutterChannel.invokeMethod("onFinishLoading", arguments: nil)
                         self.sceneView.scene = scene
                     }
                 } catch {
@@ -88,7 +102,10 @@ class GLBView: NSObject, FlutterPlatformView, UIGestureRecognizerDelegate {
         let configuration = URLSessionConfiguration.default
         let session = URLSession(configuration: configuration)
         
+        self.flutterChannel.invokeMethod("onStartDownload", arguments: nil)
+
         let task = session.downloadTask(with: downloadURL) { url, response, error in
+            self.flutterChannel.invokeMethod("onFinishDownload", arguments: nil)
             // 检查是否有错误发生
             guard error == nil else {
                 completion(nil)
