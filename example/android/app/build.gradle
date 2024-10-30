@@ -38,7 +38,8 @@ android {
         applicationId = "com.example.flutter_3d_viewer_example"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdk = flutter.minSdkVersion
+        minSdk = 24
+//        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
@@ -51,6 +52,12 @@ android {
             signingConfig = signingConfigs.debug
         }
     }
+}
+
+dependencies {
+    implementation("io.github.sceneview:sceneview:2.2.1")
+    api 'androidx.core:core-ktx:1.3.0'
+
 }
 
 flutter {
