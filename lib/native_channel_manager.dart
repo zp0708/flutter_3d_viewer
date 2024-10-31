@@ -64,4 +64,14 @@ class NativeChannelManager {
       return false;
     }
   }
+
+  /// Dispose the AR view on the platforms to pause the scenes and disconnect the platform handlers.
+  /// You should call this before removing the AR view to prevent out of memory erros
+  dispose() async {
+    try {
+      await _channel.invokeMethod<void>("dispose");
+    } catch (e) {
+      print(e);
+    }
+  }
 }

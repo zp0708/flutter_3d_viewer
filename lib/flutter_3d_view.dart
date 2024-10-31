@@ -8,14 +8,14 @@ class Flutter3DViewWrap extends StatefulWidget {
   const Flutter3DViewWrap({
     super.key,
     required this.url,
-    this.indicatorColor = Colors.white,
+    this.indicator,
     this.width = 0,
     this.height = 0,
   });
 
   final String url;
 
-  final Color indicatorColor;
+  final Widget? indicator;
 
   // width 地图宽度， height地图高度
   final double width, height;
@@ -32,6 +32,12 @@ class _Flutter3DViewWrapState extends State<Flutter3DViewWrap> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _channelManager.dispose();
+    super.dispose();
   }
 
   void onPlatformViewCreated(int id) {
@@ -64,9 +70,14 @@ class _Flutter3DViewWrapState extends State<Flutter3DViewWrap> {
         children: [
           if (loadingStatus != ViewerStatus.finishLoading)
             Center(
-              child: CircularProgressIndicator(
-                color: widget.indicatorColor,
-              ),
+              child: widget.indicator ??
+                  const SizedBox(
+                    height: 26,
+                    width: 26,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
             ),
           Positioned.fill(
             child: _nativeMapView(
