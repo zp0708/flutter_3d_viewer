@@ -3,6 +3,7 @@ package com.example.flutter_3d_viewer
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.graphics.PixelFormat
 import android.util.Log
 import android.view.Choreographer
 import android.view.SurfaceView
@@ -10,6 +11,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import com.google.android.filament.Fence
+import com.google.android.filament.Skybox
 import com.google.android.filament.utils.*
 import com.google.android.filament.utils.RemoteServer.ReceivedMessage
 import io.flutter.plugin.common.BinaryMessenger
@@ -68,7 +70,6 @@ internal class Flutter3dAndroidView(
         surfaceView.layoutParams = FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
         surfaceView.setBackgroundColor(Color.TRANSPARENT)
         surfaceView.visibility = View.GONE
-
         choreographer = Choreographer.getInstance()
 
         modelViewer = ModelViewer(surfaceView)
@@ -76,12 +77,10 @@ internal class Flutter3dAndroidView(
         viewerContent.sunlight = modelViewer.light
         viewerContent.lightManager = modelViewer.engine.lightManager
         viewerContent.scene = modelViewer.scene
-        val clearOptions = modelViewer.renderer.clearOptions
-        clearOptions.clear = true
-        clearOptions.discard = true
-        clearOptions.clearColor
-        modelViewer.renderer.clearOptions = clearOptions
-
+        modelViewer.renderer.clearOptions = modelViewer.renderer.clearOptions.apply {
+            clear = true
+        }
+        surfaceView.holder.setFormat(PixelFormat.TRANSLUCENT)
         viewerContent.renderer = modelViewer.renderer
         viewerContent.scene.skybox = null
 
@@ -95,6 +94,7 @@ internal class Flutter3dAndroidView(
         val view = modelViewer.view
 
         view.blendMode = com.google.android.filament.View.BlendMode.TRANSLUCENT
+        modelViewer.scene.skybox = null
 
         view.renderQuality = view.renderQuality.apply {
             hdrColorBuffer = com.google.android.filament.View.QualityLevel.MEDIUM
@@ -203,9 +203,10 @@ internal class Flutter3dAndroidView(
             scene.indirectLight!!.intensity = 30_000.0f
             viewerContent.indirectLight = modelViewer.scene.indirectLight
         }
-        readCompressedAsset("env/${ibl}_skybox.ktx").let {
-            scene.skybox = KTX1Loader.createSkybox(engine, it)
-        }
+//        modelViewer.scene.skybox = Skybox.Builder().color(.62f, 0.64f, 0.78f, 1f).build(modelViewer.engine)
+//        readCompressedAsset("env/${ibl}_skybox.ktx").let {
+//            scene.skybox = KTX1Loader.createSkybox(engine, it)
+//        }
     }
 
     private fun readCompressedAsset(assetName: String): ByteBuffer {
