@@ -76,7 +76,7 @@ internal class Flutter3dAndroidView(
 
         modelViewer = ModelViewer(surfaceView)
         viewerContent.view = modelViewer.view
-        modelViewer.cameraFocalLength = 45.0f
+        modelViewer.cameraFocalLength = 48.0f
         viewerContent.sunlight = modelViewer.light
         viewerContent.lightManager = modelViewer.engine.lightManager
         viewerContent.scene = modelViewer.scene
