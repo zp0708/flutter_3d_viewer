@@ -10,10 +10,7 @@ import android.view.SurfaceView
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import com.google.android.filament.Engine
 import com.google.android.filament.Fence
-import com.google.android.filament.Skybox
-import com.google.android.filament.gltfio.FilamentAsset
 import com.google.android.filament.utils.*
 import com.google.android.filament.utils.RemoteServer.ReceivedMessage
 import io.flutter.plugin.common.BinaryMessenger
