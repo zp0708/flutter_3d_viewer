@@ -10,8 +10,10 @@ import android.view.SurfaceView
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import com.google.android.filament.Engine
 import com.google.android.filament.Fence
 import com.google.android.filament.Skybox
+import com.google.android.filament.gltfio.FilamentAsset
 import com.google.android.filament.utils.*
 import com.google.android.filament.utils.RemoteServer.ReceivedMessage
 import io.flutter.plugin.common.BinaryMessenger
@@ -74,6 +76,7 @@ internal class Flutter3dAndroidView(
 
         modelViewer = ModelViewer(surfaceView)
         viewerContent.view = modelViewer.view
+        modelViewer.cameraFocalLength = 45.0f
         viewerContent.sunlight = modelViewer.light
         viewerContent.lightManager = modelViewer.engine.lightManager
         viewerContent.scene = modelViewer.scene
@@ -82,7 +85,6 @@ internal class Flutter3dAndroidView(
         }
         surfaceView.holder.setFormat(PixelFormat.TRANSLUCENT)
         viewerContent.renderer = modelViewer.renderer
-        viewerContent.scene.skybox = null
 
         surfaceView.setOnTouchListener { _, event ->
             modelViewer.onTouchEvent(event)
