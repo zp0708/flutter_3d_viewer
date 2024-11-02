@@ -203,9 +203,9 @@ internal class Flutter3dAndroidView(
             scene.indirectLight!!.intensity = 30_000.0f
             viewerContent.indirectLight = modelViewer.scene.indirectLight
         }
-//        readCompressedAsset("env/${ibl}_skybox.ktx").let {
-//            scene.skybox = KTX1Loader.createSkybox(engine, it)
-//        }
+        readCompressedAsset("env/${ibl}_skybox.ktx").let {
+            scene.skybox = KTX1Loader.createSkybox(engine, it)
+        }
     }
 
     private fun readCompressedAsset(assetName: String): ByteBuffer {
@@ -312,7 +312,7 @@ internal class Flutter3dAndroidView(
     }
 
     override fun dispose() {
-        TODO("Not yet implemented")
+        choreographer.removeFrameCallback(frameScheduler)
     }
 }
 
